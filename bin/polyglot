@@ -1,45 +1,39 @@
 #!/usr/bin/env python
 #coding: utf-8
 import logging
-import click
+import os
+import sys
 
-from polyglot.db import DataBase
-from polyglot.classifier import Classifier
+from docopt import docopt
+from polyglot import DataBase, Classifier, __version__
 
-@click.group()
-def cli():
-    pass
+USAGE="""Usage:
+    {script} train CORPUS [-n INT] [-o OUTPUT] [-v | --verbose ]
+    {script} classify FILE  [-n INT] [-s STATISTICS]
+    {script} (-h | --help | --version)
 
-@cli.command()
-@click.argument('corpus', default='./corpus',
-        help='The corpus folder for training.')
-@click.option('-n', '--ngram', default=3, type=click.INT, metavar='<int>',
-        help='The size of grams to use, the larger the better, but more expensive.')
-@click.option('-v', '--verbose', is_flag=True, help='Run in debug mode.')
-@click.option('-o', '--output', type=click.File('w'), default='-',
-        help='File to store training result.')
-def train(corpus, ngram, output, verbose):
-    """Train polyglot from the corpus folder, each sub-folder represents a language
-    which contains many files written in that language."""
-    if verbose:
-        from polyglot.classifier import logger
-        logger.setLevel(logging.DEBUG)
-    db = DataBase(output)
-    master = Classifier(db, ngram)
-    master.train(corpus)
+Options:
+    -n INT, --ngram=INT  The size of grams to use, the larger the better, but more expensive [default: 3].
+    -o OUTPUT, --output=OUTPUT  File to store traing result (a single hyphen-minus (-) means stdin) [default: statistics.json].
+    -s STATISTICS, --statistics=STATISTICS  File which holds the training result [default: statistics.json].
+    -v, --verbose  Run in debug mode.
+    CORPUS  The corpus folder for training [default: corpus].
+    FILE  Input source code to classify (a single hyphen-minus (-) means stdin).
 
-@cli.command()
-@click.argument('file', type=click.File('r'), default='-',
-        help='Input source code to classify (or standard input if no files are named, or if a single hyphen-minus (-) is given as file name).')
-@click.option('-n', '--ngram', default=3, type=click.INT,
-        help='The size of grams to use, the larger the better, but more expensive.')
-@click.option('-s', '--statistics', type=click.File('r'), default='./statistics.json',
-        help='File which holds the training result.')
-def classify(file, statistics, ngram):
-    """Tell which language the file is written with, based on the statistics result."""
-    db = DataBase(statistics)
-    master = Classifier(db, ngram)
-    print master.classify(file.read())[:3]
+""".format(script=os.path.basename(__file__))
 
 if __name__ == '__main__':
-    cli()
+    args = docopt(USAGE, version=__version__)
+    if args['--verbose']:
+        from polyglot.classifier import logger
+        logger.setLevel(logging.DEBUG)
+    if args['train']:
+        outstream = sys.stdout if args['--output']=='-' else open(args['--output'], 'w')
+        db = DataBase(outstream)
+        master = Classifier(db, int(args['--ngram']))
+        master.train(args['CORPUS'] or './corpus')
+    elif args['classify']:
+        instream = sys.stdin if args['FILE']=='-' else open(args['FILE'])
+        db = DataBase(open(args['--statistics']))
+        master = Classifier(db, int(args['--ngram']))
+        print master.classify(instream.read())[:3]
