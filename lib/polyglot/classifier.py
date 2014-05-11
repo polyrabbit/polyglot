@@ -55,11 +55,16 @@ class Classifier(object):
     def p_lang_on_token(self, lang, token):
         # P(lang | token) = P(token | lang) * P(lang) / P(token)
         # return self.p_token_on_lang(token, lang) * self.p_lang(lang) / self.p_token(token)
+        if not self.db.c_token_on_lang(token, lang) or not self.db.c_token(token):
+            # If this token is unseen, its prob should be less than what is seen only once
+            logger.debug('%s is not seen in %s, use %f instead', token, lang,
+                    0.5/self.db.c_tokens_on_lang(lang))
+            return 0.5/self.db.c_tokens_on_lang(lang)
         return self.db.c_token_on_lang(token, lang) / self.db.c_token(token)
 
 if __name__ == '__main__':
-    db = DataBase('statistics.json')
+    db = DataBase(open('statistics.json'))
     classifier = Classifier(db)
     # classifier.train('corpus')
-    print classifier.classify('import')
+    print classifier.classify('fdsfdsasafds')
 

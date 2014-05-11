@@ -1,9 +1,10 @@
 from __future__ import division
 import json
 from collections import defaultdict as dd
+from operator import countOf
 
 class DataBase(object):
-    def __init__(self, fp):
+    def __init__(self, fp):  # Use fp for the sake of click, filename should be better
         # Use token table for dict compression
         self.tid = 0
         self.tokens = {}
@@ -39,6 +40,12 @@ class DataBase(object):
         tid = self.to_tids(token)
         return sum(stats.get(tid, 0) for stats in self.lang_stats.values())
 
+    def c_once(self):
+        return sum(countOf(stats.values(), 1) for stats in self.lang_stats.values())
+
+    def total_count(self):
+        return sum(sum(stats.values()) for stats in self.lang_stats.values())
+
     def languages(self):
         return self.lang_stats.keys()
 
@@ -63,3 +70,4 @@ if __name__ == '__main__':
     db = DataBase(open('statistics.json'))
     db.load()
     print db.c_tokens_on_lang('Python')
+    print db.c_once()

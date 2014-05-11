@@ -33,10 +33,14 @@ def train(corpus, ngram, output, verbose):
         help='Input source code to classify (or standard input if no files are named, or if a single hyphen-minus (-) is given as file name).')
 @click.option('-n', '--ngram', default=3, type=click.INT,
         help='The size of grams to use, the larger the better, but more expensive.')
+@click.option('-v', '--verbose', is_flag=True, help='Run in debug mode.')
 @click.option('-s', '--statistics', type=click.File('r'), default='./statistics.json',
         help='File which holds the training result.')
-def classify(file, statistics, ngram):
+def classify(file, statistics, ngram, verbose):
     """Tell which language the file is written with, based on the statistics result."""
+    if verbose:
+        from polyglot.classifier import logger
+        logger.setLevel(logging.DEBUG)
     db = DataBase(statistics)
     master = Classifier(db, ngram)
     print master.classify(file.read())[:3]
