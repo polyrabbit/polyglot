@@ -8,6 +8,8 @@ from shlex import shlex
 from collections import deque
 from chardet import detect
 
+from .logger import logger
+
 class Ngrams(object):
     def __init__(self, n):
         self.n = n
@@ -23,8 +25,11 @@ class Ngrams(object):
 def tokenize(data):
     if not isinstance(data, unicode):
         ie = detect(data)['encoding']
+        if not ie:
+            raise UnicodeDecodeError(b'oops', b'Unknown encoding', 0, 1, data)
         data = data.decode(ie)
-    for token in shlex(data):
+    for token in data.split():  #TODO, shit! abap use " as its comment
+    # for token in shlex(data):
     # for token in shlex(data.replace('"""', '"').replace("'''", "'")):  # For python
         if token.isdigit():
             continue
