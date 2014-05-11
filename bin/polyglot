@@ -1,10 +1,13 @@
 #!/usr/bin/env python
 #coding: utf-8
+import os
+import sys
 import logging
 import click
 
 from polyglot.db import DataBase
 from polyglot.classifier import Classifier
+from polyglot.logger import logger
 
 @click.group()
 def cli():
@@ -20,10 +23,12 @@ def cli():
         help='File to store training result.')
 def train(corpus, ngram, output, verbose):
     """Train polyglot from the corpus folder, each sub-folder represents a language
-    which contains many files written in that language."""
+    which contains many files written in that language(excluding files starting with "." of course)."""
     if verbose:
-        from polyglot.classifier import logger
         logger.setLevel(logging.DEBUG)
+    if not os.path.isdir(corpus):
+        print >> sys.stderr, '%s is not a folder.' % corpus
+        return
     db = DataBase(output)
     master = Classifier(db, ngram)
     master.train(corpus)
@@ -39,7 +44,6 @@ def train(corpus, ngram, output, verbose):
 def classify(file, statistics, ngram, verbose):
     """Tell which language the file is written with, based on the statistics result."""
     if verbose:
-        from polyglot.classifier import logger
         logger.setLevel(logging.DEBUG)
     db = DataBase(statistics)
     master = Classifier(db, ngram)

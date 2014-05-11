@@ -1,15 +1,11 @@
 #coding: utf-8
 from __future__ import division
 import os
-import logging
 import collections
 
-from db import DataBase
-from tokenizer import tokenize, Ngrams
-
-FORMAT = '%(asctime)s -- %(message)s'
-logging.basicConfig(format=FORMAT)
-logger = logging.getLogger()
+from .db import DataBase
+from .tokenizer import tokenize, Ngrams
+from .logger import logger
 
 class Classifier(object):
     
@@ -30,8 +26,16 @@ class Classifier(object):
                 logger.warning('No %s files found under %s', lang, os.path.join(corpus_dir, lang))
             for fpath in file_paths:
                 logger.debug('Parsing %s file %s', lang, fpath)
-                tokens = tokenize(open(fpath).read())
-                map(lambda tok : self.db.put(lang, tok), self.trigram(tokens))
+                try:
+                    fcontent = open(fpath).read()
+                    tokens = tokenize(fcontent)
+                    # Errors from generator won't trigger until evaluated,
+                    # so enclose the evaluator here
+                    map(lambda tok : self.db.put(lang, tok), self.trigram(tokens))
+                except UnicodeDecodeError:
+                    if fcontent:
+                        logger.warning('Cannot decode %s to unicode', fpath)
+                    continue
         self.db.save()
 
     def classify(self, data):
