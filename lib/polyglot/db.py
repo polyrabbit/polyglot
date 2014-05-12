@@ -2,6 +2,7 @@ from __future__ import division
 import json
 from collections import defaultdict as dd
 from operator import countOf
+from functools32 import lru_cache
 
 class DataBase(object):
     def __init__(self, fp):  # Use fp for the sake of click, filename should be better
@@ -15,6 +16,7 @@ class DataBase(object):
         self.tid += 1
         return str(self.tid)
 
+    @lru_cache(maxsize=None)
     def to_tids(self, tokens):
         tids = []
         for tok in tokens if isinstance(tokens, (list, tuple)) else (tokens,):
@@ -26,26 +28,33 @@ class DataBase(object):
     def put(self, language, tokens):
         self.lang_stats[language][self.to_tids(tokens)] += 1
 
+    @lru_cache(maxsize=None)
     def c_token_on_lang(self, token, lang):
         tid = self.to_tids(token)
         return self.lang_stats.get(lang, {}).get(tid, 0)
 
+    @lru_cache(maxsize=None)
     def c_tokens_on_lang(self, lang):
         return sum(self.lang_stats.get(lang, {}).values())
 
+    @lru_cache(maxsize=None)
     def c_tokens(self):
         return len(self.tokens)
 
+    @lru_cache(maxsize=None)
     def c_token(self, token):
         tid = self.to_tids(token)
         return sum(stats.get(tid, 0) for stats in self.lang_stats.values())
 
+    @lru_cache(maxsize=None)
     def c_once(self):
         return sum(countOf(stats.values(), 1) for stats in self.lang_stats.values())
 
+    @lru_cache(maxsize=None)
     def total_count(self):
         return sum(sum(stats.values()) for stats in self.lang_stats.values())
 
+    @lru_cache(maxsize=None)
     def languages(self):
         return self.lang_stats.keys()
 

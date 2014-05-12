@@ -1,2 +1,3 @@
 chardet
 click==0.1
+functools32
