@@ -40,6 +40,9 @@ coverage.xml
 .project
 .pydevproject
 
+# OS X
+.DS_Store
+
 # Rope
 .ropeproject
 
