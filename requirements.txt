@@ -1,3 +1,4 @@
-chardet
-click==0.1
-functools32
+chardet==2.3.0
+click==4.0
+functools32==3.2.3-1
+wsgiref==0.1.2

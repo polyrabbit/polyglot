@@ -43,6 +43,9 @@ coverage.xml
 # OS X
 .DS_Store
 
+# pycharm
+.idea/
+
 # Rope
 .ropeproject
 

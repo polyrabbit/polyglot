@@ -2,13 +2,14 @@
 from __future__ import unicode_literals
 import sys
 import StringIO
+import logging
 # A monkey patch to ensure cStringIO support unicode
 sys.modules['cStringIO'] = StringIO
 from shlex import shlex
 from collections import deque
 from chardet import detect
 
-from .logger import logger
+logger = logging.getLogger(__name__)
 
 class Ngrams(object):
     def __init__(self, n):

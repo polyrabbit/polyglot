@@ -2,10 +2,12 @@
 from __future__ import division
 import os
 import collections
+import logging
 
 from .db import DataBase
 from .tokenizer import tokenize, Ngrams
-from .logger import logger
+
+logger = logging.getLogger(__name__)
 
 class Classifier(object):
     
