@@ -14,6 +14,8 @@ setup(
     include_package_data=True,
     platforms='any',
     install_requires=open('./requirements.txt').read().split('\n'),
+    test_suite='nose.collector',
+    tests_require=['nose'],
     entry_points={
         "console_scripts": ["polyglot=polyglot.cli:run"]
     }
