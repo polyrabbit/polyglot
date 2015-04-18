@@ -16,7 +16,7 @@ def run():
 
 @run.command()
 @click.option('-c', '--corpus', default='corpus', type=click.Path(exists=True),
-        help='The corpus folder for training.')
+        help='The corpus folder for training(default corpus).')
 @click.option('-n', '--ngram', default=3, type=click.INT,
         help='The size of grams to use, the larger the better, but more expensive(default 3).')
 @click.option('-v', '--verbose', is_flag=True, help='Run in debug mode.')
@@ -42,13 +42,13 @@ def train(corpus, ngram, output, verbose):
 @click.option('-t', '--top', default=3, type=click.INT,
         help='Output top N most likely language(default 3).')
 @click.option('-v', '--verbose', is_flag=True, help='Run in debug mode.')
-@click.option('-s', '--statistics', type=click.File('r', lazy=True), default='statistics.json',
-        help='File which holds the training result.')
-def classify(file, statistics, ngram, top, verbose):
+@click.option('-m', '--model', type=click.File('r', lazy=True), default='model.json',
+        help='Language model file which holds the training result(default model.json).')
+def classify(file, model, ngram, top, verbose):
     """Do a Naive Bayes classifier on the given FILE, output top N most likely languages"""
     if verbose:
         logging.getLogger().setLevel(logging.DEBUG)
-    db = DataBase(statistics)
+    db = DataBase(model)
     master = Classifier(db, ngram)
     print master.classify(file.read())[:top]
 
