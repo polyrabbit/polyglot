@@ -23,15 +23,15 @@ class Ngrams(object):
             for i in xrange(len(_last_grams)):
                 yield _last_grams[i:self.n]
 
-def tokenize(data):
-    if not isinstance(data, unicode):
-        ie = detect(data)['encoding']
+def lex(text):
+    if not isinstance(text, unicode):
+        ie = detect(text)['encoding']
         if not ie:
-            raise UnicodeDecodeError(b'oops', b'Unknown encoding', 0, 1, data)
-        data = data.decode(ie)
-    for token in data.split():  #TODO, shit! abap use " as its comment
-    # for token in shlex(data):
-    # for token in shlex(data.replace('"""', '"').replace("'''", "'")):  # For python
+            raise UnicodeDecodeError(b'oops', b'Unknown encoding', 0, 1, text)
+        text = text.decode(ie)
+    for token in text.split():  #TODO, shit! abap use " as its comment
+    # for token in shlex(text):
+    # for token in shlex(text.replace('"""', '"').replace("'''", "'")):  # For python
         if token.isdigit():
             continue
         # elif token.startswith(('"', "'")):
@@ -40,5 +40,5 @@ def tokenize(data):
             yield token
 
 if __name__ == '__main__':
-    assert list(tokenize('aa "ss" 23我')) == ['aa', '"ss"', u'我']
+    assert list(lex('aa "ss" 23我')) == ['aa', '"ss"', u'我']
     assert len(list(Ngrams(3)(xrange(7)))) == 1+2+3*5

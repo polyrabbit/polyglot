@@ -5,7 +5,7 @@ import collections
 import logging
 
 from .db import DataBase
-from .tokenizer import tokenize, Ngrams
+from .lexer import lex, Ngrams
 
 logger = logging.getLogger(__name__)
 
@@ -30,7 +30,7 @@ class Classifier(object):
                 logger.debug('Parsing %s file %s', lang, fpath)
                 try:
                     fcontent = open(fpath).read()
-                    tokens = tokenize(fcontent)
+                    tokens = lex(fcontent)
                     # Errors from generator won't trigger until evaluated,
                     # so enclose the evaluator here
                     map(lambda tok : self.db.put(lang, tok), self.trigram(tokens))
@@ -40,10 +40,10 @@ class Classifier(object):
                     continue
         self.db.save()
 
-    def classify(self, data):
+    def classify(self, text):
         self.db.load()
-        score = collections.defaultdict(lambda :1.0)
-        for tok in self.trigram(tokenize(data)):
+        score = collections.defaultdict(lambda: 1.0)
+        for tok in self.trigram(lex(text)):
             for lang in self.db.languages():
                 score[lang] *= self.p_lang_on_token(lang, tok)
         return sorted(score.items(), key=lambda s: s[1], reverse=True)

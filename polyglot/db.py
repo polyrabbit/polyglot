@@ -4,6 +4,9 @@ from collections import defaultdict as dd
 from operator import countOf
 from functools32 import lru_cache
 
+import logging
+logger = logging.getLogger(__name__)
+
 class DataBase(object):
     def __init__(self, fp):  # Use fp for the sake of click, filename should be better
         # Use token table for dict compression
@@ -59,7 +62,9 @@ class DataBase(object):
         return self.lang_stats.keys()
 
     def load(self):
+        logger.debug('Loading model file...')
         data = json.load(self.fp)
+        logger.debug('Finished loading')
         self.tokens = data['tokens']
         self.lang_stats = data['lang_stats']
         self.tid = len(self.tokens)
@@ -67,8 +72,10 @@ class DataBase(object):
     def save(self):
         json.dump(
             # {'tokens': sorted(self.tokens.items(), key=lambda t: int(t[1])),
-            {'tokens': self.tokens,
-            'lang_stats': self.lang_stats},
+            {
+                'tokens': self.tokens,
+                'lang_stats': self.lang_stats
+            },
             self.fp,
             indent=2,
             sort_keys=False
@@ -76,7 +83,7 @@ class DataBase(object):
         self.fp.flush()
 
 if __name__ == '__main__':
-    db = DataBase(open('statistics.json'))
+    db = DataBase(open('model.json'))
     db.load()
     print db.c_tokens_on_lang('Python')
     print db.c_once()
