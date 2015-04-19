@@ -11,19 +11,16 @@ from chardet import detect
 
 logger = logging.getLogger(__name__)
 
-class Ngrams(object):
-    def __init__(self, n):
-        self.n = n
-
-    def __call__(self, iterable):
-        last_grams = deque(maxlen=self.n)
-        for ite in iterable:
-            last_grams.append(ite)
-            _last_grams = tuple(last_grams)
-            for i in xrange(len(_last_grams)):
-                yield _last_grams[i:self.n]
+def ngram(iterable, grams):
+    last_grams = deque(maxlen=grams)
+    for ite in iterable:
+        last_grams.append(ite)
+        _last_grams = tuple(last_grams)
+        for i in xrange(len(_last_grams)):
+            yield _last_grams[i:grams]
 
 def lex(text):
+    """Yields a list of tokens from a given text."""
     if not isinstance(text, unicode):
         ie = detect(text)['encoding']
         if not ie:
@@ -41,4 +38,4 @@ def lex(text):
 
 if __name__ == '__main__':
     assert list(lex('aa "ss" 23我')) == ['aa', '"ss"', u'我']
-    assert len(list(Ngrams(3)(xrange(7)))) == 1+2+3*5
+    assert len(list(ngram(xrange(7), 3))) == 1+2+3*5

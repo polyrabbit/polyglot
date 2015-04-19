@@ -5,7 +5,7 @@ import sys
 import logging
 import click
 
-from .db import DataBase
+from .model import LanguageModel
 from .classifier import Classifier
 
 logging.basicConfig(format='%(asctime)s -- %(message)s')
@@ -20,8 +20,8 @@ def run():
 @click.option('-n', '--ngram', default=3, type=click.INT,
         help='The size of grams to use, the larger the better, but more expensive(default 3).')
 @click.option('-v', '--verbose', is_flag=True, help='Run in debug mode.')
-@click.option('-o', '--output', type=click.File('w'),
-        help='File to store training result.')
+@click.option('-o', '--output', type=click.File('w'), default='-',
+        help='File to store training result(default to stdout).')
 def train(corpus, ngram, output, verbose):
     """Train polyglot from the corpus folder, each sub-folder represents a language
     which contains many files written in that language(excluding files starting with "." of course)."""
@@ -30,7 +30,7 @@ def train(corpus, ngram, output, verbose):
     if not os.path.isdir(corpus):
         print >> sys.stderr, '%s is not a folder.' % corpus
         return
-    db = DataBase(output)
+    db = LanguageModel(output)
     master = Classifier(db, ngram)
     master.train(corpus)
 
@@ -48,7 +48,7 @@ def classify(file, model, ngram, top, verbose):
     """Do a Naive Bayes classifier on the given FILE, output top N most likely languages"""
     if verbose:
         logging.getLogger().setLevel(logging.DEBUG)
-    db = DataBase(model)
+    db = LanguageModel(model)
     master = Classifier(db, ngram)
     print master.classify(file.read())[:top]
 
