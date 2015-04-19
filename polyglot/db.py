@@ -8,11 +8,32 @@ import logging
 logger = logging.getLogger(__name__)
 
 class DataBase(object):
-    def __init__(self, fp):  # Use fp for the sake of click, filename should be better
-        # Use token table for dict compression
+    def __init__(self, fp):  # Filename should be better?
         self.tid = 0
+        # Map between token literals and their ids
+        # e.g.
+        # {
+        #     "from": "1",
+        #     "urllib2": "2",
+        #     "import": "3"
+        # }
         self.tokens = {}
-        self.lang_stats = dd(lambda : dd(int))
+        # Statistics of tokens in a language,
+        # each key is a language name, and the value is a dict
+        # consisting of token ids and their occurrence numbers
+        # e.g.
+        # {
+        #     "Python": {
+        #         "1": 2,
+        #         "2": 1,
+        #         "3": 5
+        #     },
+        #     "Java": {
+        #         "3": 5,
+        #         "6": 3
+        #     }
+        # }
+        self.lang_stats = dd(lambda: dd(int))
         self.fp = fp
     
     def next_tid(self):
@@ -21,6 +42,7 @@ class DataBase(object):
 
     @lru_cache(maxsize=None)
     def to_tids(self, tokens):
+        """Replace a token list with the corresponding token ids"""
         tids = []
         for tok in tokens if isinstance(tokens, (list, tuple)) else (tokens,):
             if tok not in self.tokens:
@@ -38,14 +60,17 @@ class DataBase(object):
 
     @lru_cache(maxsize=None)
     def c_tokens_on_lang(self, lang):
+        """Returns number of tokens given a specified language"""
         return sum(self.lang_stats.get(lang, {}).values())
 
     @lru_cache(maxsize=None)
     def c_tokens(self):
+        """Returns number of unique tokens"""
         return len(self.tokens)
 
     @lru_cache(maxsize=None)
     def c_token(self, token):
+        """Returns number of a specified token"""
         tid = self.to_tids(token)
         return sum(stats.get(tid, 0) for stats in self.lang_stats.values())
 
@@ -55,6 +80,7 @@ class DataBase(object):
 
     @lru_cache(maxsize=None)
     def total_count(self):
+        """Returns number of all tokens"""
         return sum(sum(stats.values()) for stats in self.lang_stats.values())
 
     @lru_cache(maxsize=None)

@@ -20,8 +20,8 @@ def run():
 @click.option('-n', '--ngram', default=3, type=click.INT,
         help='The size of grams to use, the larger the better, but more expensive(default 3).')
 @click.option('-v', '--verbose', is_flag=True, help='Run in debug mode.')
-@click.option('-o', '--output', type=click.File('w'),
-        help='File to store training result.')
+@click.option('-o', '--output', type=click.File('w'), default='-',
+        help='File to store training result(default to stdout).')
 def train(corpus, ngram, output, verbose):
     """Train polyglot from the corpus folder, each sub-folder represents a language
     which contains many files written in that language(excluding files starting with "." of course)."""

@@ -5,7 +5,7 @@ import collections
 import logging
 
 from .db import DataBase
-from .lexer import lex, Ngrams
+from .lexer import lex, ngram
 
 logger = logging.getLogger(__name__)
 
@@ -13,27 +13,25 @@ class Classifier(object):
     
     def __init__(self, db, grams=3):
         self.db = db
-        self.trigram = Ngrams(grams)
+        self.grams = grams
 
     def train(self, corpus_dir):
         _, langs, _ = os.walk(corpus_dir).next()
         if not langs:
-            logger.warning('No languages found under %s', corpus_dir)
+            logger.warning('No language is found under %s', corpus_dir)
         for lang in filter(lambda l: not l.startswith('.'), langs):
             logger.debug('Processing %s', lang)
             file_paths = []
             for root, _, files in os.walk(os.path.join(corpus_dir, lang)):
                 file_paths.extend(map(lambda fn: os.path.join(root, fn), files))
             if not file_paths:
-                logger.warning('No %s files found under %s', lang, os.path.join(corpus_dir, lang))
+                logger.warning('No %s file is found under %s', lang, os.path.join(corpus_dir, lang))
             for fpath in file_paths:
                 logger.debug('Parsing %s file %s', lang, fpath)
                 try:
                     fcontent = open(fpath).read()
                     tokens = lex(fcontent)
-                    # Errors from generator won't trigger until evaluated,
-                    # so enclose the evaluator here
-                    map(lambda tok : self.db.put(lang, tok), self.trigram(tokens))
+                    map(lambda tok: self.db.put(lang, tok), ngram(tokens, self.grams))
                 except UnicodeDecodeError:
                     if fcontent:
                         logger.warning('Cannot decode %s to unicode', fpath)
@@ -69,7 +67,7 @@ class Classifier(object):
         return self.db.c_token_on_lang(token, lang) / self.db.c_token(token)
 
 if __name__ == '__main__':
-    db = DataBase(open('statistics.json'))
+    db = DataBase(open('model.json'))
     classifier = Classifier(db)
     # classifier.train('corpus')
     print classifier.classify('fdsfdsasafds')
