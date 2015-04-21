@@ -11,13 +11,17 @@ from chardet import detect
 
 logger = logging.getLogger(__name__)
 
-def ngram(iterable, grams):
-    last_grams = deque(maxlen=grams)
-    for ite in iterable:
-        last_grams.append(ite)
-        _last_grams = tuple(last_grams)
-        for i in xrange(len(_last_grams)):
-            yield _last_grams[i:grams]
+def ngram(iterable, max_n, min_n=1):
+    """
+    Yields n-grams from a iterable
+    see http://locallyoptimal.com/blog/2013/01/20/elegant-n-gram-generation-in-python/
+    >>> list(ngram([1, 2, 3, 4], 3, 1))
+    [(1,), (2,), (3,), (4,), (1, 2), (2, 3), (3, 4), (1, 2, 3), (2, 3, 4)]
+    """
+    iterable = tuple(iterable)
+    for i in range(min_n, max_n+1):
+        for grams in zip(*[iterable[j:] for j in range(i)]):
+            yield grams
 
 def lex(text):
     """Yields a list of tokens from a given text."""
