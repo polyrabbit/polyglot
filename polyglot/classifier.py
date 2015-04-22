@@ -48,19 +48,22 @@ class Classifier(object):
         Returns a sorted array of possible languages. Each item contains
         a language name and a confidence level from 0 to 1.
         """
-        def prod(iterable):
-            return reduce(lambda x, y: x*y, iterable, 1.0)
-
         self.model.load()
         confidence = collections.defaultdict(lambda: 1.0)
         for lang in self.model.languages():
             probability_list = []
             for gram in ngram(lex(text), self.grams):
                 probability_list.append(self.p_lang_on_token(lang, gram))
-            prod_of_probability = prod(probability_list)
-            prod_of_complementing_probability = prod([1-p for p in probability_list])
-            confidence[lang] = prod_of_probability / (prod_of_probability + prod_of_complementing_probability)
+            confidence[lang] = self.combined_probability(probability_list)
         return sorted(confidence.items(), key=lambda s: s[1], reverse=True)
+
+    def combined_probability(self, probability_list):
+        def prod(iterable):
+            return reduce(lambda x, y: x*y, iterable, 1.0)
+
+        prod_of_probability = prod(probability_list)
+        prod_of_complementing_probability = prod([1-p for p in probability_list])
+        return prod_of_probability / (prod_of_probability + prod_of_complementing_probability)
 
     # TODO, some cache
     def p_token_on_lang(self, token, lang):
