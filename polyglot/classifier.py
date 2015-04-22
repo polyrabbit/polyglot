@@ -35,7 +35,7 @@ class Classifier(object):
                 try:
                     fcontent = open(fpath).read()
                     tokens = lex(fcontent)
-                    map(lambda tok: self.model.put(lang, tok), ngram(tokens, self.grams))
+                    map(lambda gram: self.model.put(lang, gram), ngram(tokens, self.grams))
                 except UnicodeDecodeError:
                     if fcontent:
                         logger.warning('Cannot decode %s to unicode', fpath)
@@ -48,31 +48,51 @@ class Classifier(object):
         Returns a sorted array of possible languages. Each item contains
         a language name and a confidence level from 0 to 1.
         """
+        def prod(iterable):
+            return reduce(lambda x, y: x*y, iterable, 1.0)
+
         self.model.load()
-        score = collections.defaultdict(lambda: 1.0)
-        for tok in ngram(lex(text), self.grams):
-            for lang in self.model.languages():
-                score[lang] *= self.p_lang_on_token(lang, tok)
-        return sorted(score.items(), key=lambda s: s[1], reverse=True)
+        confidence = collections.defaultdict(lambda: 1.0)
+        for lang in self.model.languages():
+            probability_list = []
+            for gram in ngram(lex(text), self.grams):
+                probability_list.append(self.p_lang_on_token(lang, gram))
+            prod_of_probability = prod(probability_list)
+            prod_of_complementing_probability = prod([1-p for p in probability_list])
+            confidence[lang] = prod_of_probability / (prod_of_probability + prod_of_complementing_probability)
+        return sorted(confidence.items(), key=lambda s: s[1], reverse=True)
 
     # TODO, some cache
     def p_token_on_lang(self, token, lang):
-        return self.model.c_token_on_lang(token, lang) / self.model.c_tokens_on_lang(lang)
+        """
+        Probability of a token given a language
+        P(lang | token)
+        """
+        return self.model.c_token_on_lang(token, lang) / self.model.c_lang_tokens(lang)
 
     def p_token(self, token):
         return self.model.c_token(token) / self.model.c_tokens()
 
     def p_lang(self, lang):
-        return self.model.c_tokens_on_lang(lang) / self.model.c_tokens()
+        """
+        Probability of a language
+        """
+        return self.model.c_lang_tokens(lang) / self.model.c_tokens()
 
     def p_lang_on_token(self, lang, token):
-        # P(lang | token) = P(token | lang) * P(lang) / P(token)
-        # return self.p_token_on_lang(token, lang) * self.p_lang(lang) / self.p_token(token)
+        """"
+        Probability of a language given a token
+        P(lang | token) = P(token | lang) * P(lang) / P(token)
+        = c_token_on_lang(token, lang) / c_lang_tokens(lang)
+            * c_lang_tokens(token) / c_tokens()
+            / (c_token(token) / c_tokens() )
+        = c_token_on_lang(token, lang) / c_lang_tokens(lang)
+        """
         if not self.model.c_token_on_lang(token, lang) or not self.model.c_token(token):
             # If this token is unseen, its prob should be less than what is seen only once
             logger.debug('%s is not seen in %s, use %f instead', token, lang,
-                    0.5/self.model.c_tokens_on_lang(lang))
-            return 0.5/self.model.c_tokens_on_lang(lang)
+                    0.5/self.model.c_lang_tokens(lang))
+            return 0.5/self.model.c_lang_tokens(lang)
         return self.model.c_token_on_lang(token, lang) / self.model.c_token(token)
 
 if __name__ == '__main__':

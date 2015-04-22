@@ -59,7 +59,7 @@ class LanguageModel(object):
         return self.lang_stats.get(lang, {}).get(tid, 0)
 
     @lru_cache(maxsize=None)
-    def c_tokens_on_lang(self, lang):
+    def c_lang_tokens(self, lang):
         """Returns number of tokens given a specified language"""
         return sum(self.lang_stats.get(lang, {}).values())
 
@@ -111,5 +111,5 @@ class LanguageModel(object):
 if __name__ == '__main__':
     model = LanguageModel(open('model.json'))
     model.load()
-    print model.c_tokens_on_lang('Python')
+    print model.c_lang_tokens('Python')
     print model.c_once()
