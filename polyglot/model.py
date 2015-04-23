@@ -7,56 +7,35 @@ from functools32 import lru_cache
 import logging
 logger = logging.getLogger(__name__)
 
+# Since no space is allowed in token, we use it as a separator
+TOK_SEP = ' '
+
 class LanguageModel(object):
     def __init__(self, fp):  # Filename should be better?
-        self.tid = 0
-        # Map between token literals and their ids
-        # e.g.
-        # {
-        #     "from": "1",
-        #     "urllib2": "2",
-        #     "import": "3"
-        # }
-        self.tokens = {}
         # Statistics of tokens in a language,
         # each key is a language name, and the value is a dict
-        # consisting of token ids and their occurrence numbers
+        # consisting of tokens and their occurrence numbers
         # e.g.
         # {
         #     "Python": {
-        #         "1": 2,
-        #         "2": 1,
-        #         "3": 5
+        #         "from": 2,
+        #         "os": 1,
+        #         "import": 5
         #     },
         #     "Java": {
-        #         "3": 5,
-        #         "6": 3
+        #         "import": 5,
+        #         "java": 3
         #     }
         # }
         self.lang_stats = dd(lambda: dd(int))
         self.fp = fp
     
-    def next_tid(self):
-        self.tid += 1
-        return str(self.tid)
-
-    @lru_cache(maxsize=None)
-    def to_tids(self, tokens):
-        """Replace a token list with the corresponding token ids"""
-        tids = []
-        for tok in tokens if isinstance(tokens, (list, tuple)) else (tokens,):
-            if tok not in self.tokens:
-                self.tokens[tok] = self.next_tid()
-            tids.append(self.tokens[tok])
-        return ','.join(tids)
-
     def put(self, language, tokens):
-        self.lang_stats[language][self.to_tids(tokens)] += 1
+        self.lang_stats[language][tokens] += 1
 
     @lru_cache(maxsize=None)
     def c_token_on_lang(self, token, lang):
-        tid = self.to_tids(token)
-        return self.lang_stats.get(lang, {}).get(tid, 0)
+        return self.lang_stats.get(lang, {}).get(token, 0)
 
     @lru_cache(maxsize=None)
     def c_lang_tokens(self, lang):
@@ -65,23 +44,17 @@ class LanguageModel(object):
 
     @lru_cache(maxsize=None)
     def c_tokens(self):
-        """Returns number of unique tokens"""
-        return len(self.tokens)
+        """Returns number of all tokens"""
+        return sum(sum(stats.values()) for stats in self.lang_stats.values())
 
     @lru_cache(maxsize=None)
     def c_token(self, token):
         """Returns number of a specified token"""
-        tid = self.to_tids(token)
-        return sum(stats.get(tid, 0) for stats in self.lang_stats.values())
+        return sum(stats.get(token, 0) for stats in self.lang_stats.values())
 
     @lru_cache(maxsize=None)
     def c_once(self):
         return sum(countOf(stats.values(), 1) for stats in self.lang_stats.values())
-
-    @lru_cache(maxsize=None)
-    def total_count(self):
-        """Returns number of all tokens"""
-        return sum(sum(stats.values()) for stats in self.lang_stats.values())
 
     @lru_cache(maxsize=None)
     def languages(self):
@@ -89,19 +62,23 @@ class LanguageModel(object):
 
     def load(self):
         logger.debug('Loading model file...')
-        data = json.load(self.fp)
+        _lang_stats = json.load(self.fp)
+        self.lang_stats = dd(dict)
+        # Convert a TOK_SEP separated string back to tuple againg
+        for lang in _lang_stats:
+            for token in _lang_stats[lang]:
+                self.lang_stats[lang][tuple(token.split(TOK_SEP))] = _lang_stats[lang][token]
         logger.debug('Finished loading')
-        self.tokens = data['tokens']
-        self.lang_stats = data['lang_stats']
-        self.tid = len(self.tokens)
 
     def save(self):
+        _lang_stats = dd(dict)
+        # Json doesn't allow tuple to be a key, convert it to a TOK_SEP separated string
+        for lang in self.lang_stats:
+            for token in self.lang_stats[lang]:
+                _lang_stats[lang][TOK_SEP.join(token)] = self.lang_stats[lang][token]
         json.dump(
             # {'tokens': sorted(self.tokens.items(), key=lambda t: int(t[1])),
-            {
-                'tokens': self.tokens,
-                'lang_stats': self.lang_stats
-            },
+            _lang_stats,
             self.fp,
             indent=2,
             sort_keys=False
