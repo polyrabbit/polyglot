@@ -5,11 +5,26 @@ import StringIO
 import logging
 # A monkey patch to ensure cStringIO support unicode
 sys.modules['cStringIO'] = StringIO
+import re
 from shlex import shlex
 from collections import deque
 from chardet import detect
 
 logger = logging.getLogger(__name__)
+
+# Expression to match some_token and some_token="with spaces" (and similarly
+# for single-quoted strings).
+# Shamelessly steal from https://github.com/django/django/blob/master/django/utils/text.py#L335
+lexer_patt = re.compile(r""" 
+    ((?: 
+        [^\s'"]* 
+        (?: 
+            (?:"(?:[^"\\]|\\.)*" | '(?:[^'\\]|\\.)*') 
+            [^\s'"]* 
+        )+ 
+    ) | \w+ 
+    | \S) 
+""", re.VERBOSE) 
 
 def ngram(iterable, max_n, min_n=1):
     """
@@ -30,9 +45,11 @@ def lex(text):
         if not ie:
             raise UnicodeDecodeError(b'oops', b'Unknown encoding', 0, 1, text)
         text = text.decode(ie)
-    for token in text.split():  #TODO, shit! abap use " as its comment
+    # for token in text.split():  #TODO, shit! abap use " as its comment
+    for token_group in lexer_patt.finditer(text):
     # for token in shlex(text):
     # for token in shlex(text.replace('"""', '"').replace("'''", "'")):  # For python
+        token = token_group.group(0)
         if token.isdigit():
             continue
         # elif token.startswith(('"', "'")):
