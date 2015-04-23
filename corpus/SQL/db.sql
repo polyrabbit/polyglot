@@ -1,7 +1,4 @@
 SHOW WARNINGS;
---
--- Table structure for table `articles`
---
 CREATE TABLE IF NOT EXISTS `articles` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `title` varchar(255) DEFAULT NULL,
@@ -15,19 +12,12 @@ CREATE TABLE IF NOT EXISTS `articles` (
   PRIMARY KEY (`id`)
 );
 
---
--- Dumping data for table `articles`
---
 
 INSERT INTO `articles` (`title`, `content`, `date_posted`, `created_by`, `last_modified`, `last_modified_by`, `ordering`, `is_published`) VALUES
 ('Welcome', '<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed interdum, felis ac pellentesque feugiat, massa enim sagittis elit, sed dignissim sem ligula non nisl. Sed pulvinar nunc nec eros aliquet non tempus diam vehicula. Nunc tincidunt, leo ut interdum tristique, quam ligula porttitor tellus, at tincidunt magna enim nec arcu. Nunc tempor egestas libero. Vivamus nulla ligula, vehicula vitae mattis quis, laoreet eget urna. Proin eget est quis urna venenatis dictum nec vel lectus. Nullam sit amet vehicula leo. Sed commodo, orci vitae facilisis accumsan, arcu justo sagittis risus, quis aliquet purus neque eu odio. Mauris lectus orci, tincidunt in varius quis, dictum sed nibh. Quisque dapibus mollis blandit. Donec vel tellus nisl, sed scelerisque felis. Praesent ut eros tortor, sed molestie nunc. Duis eu massa at justo iaculis gravida.</p>\r\n<p>In adipiscing dictum risus a tincidunt. Sed nisi ipsum, rutrum sed ornare in, bibendum at augue. Integer ornare semper varius. Integer luctus vehicula elementum. Donec cursus elit quis erat laoreet elementum. Praesent eget justo purus, vitae accumsan massa. Ut tristique, mauris non dignissim luctus, velit justo sollicitudin odio, vel rutrum purus enim eu felis. In adipiscing elementum sagittis. Nam sed dui ante. Nunc laoreet hendrerit nisl vitae porta. Praesent sit amet ligula et nisi vulputate volutpat. Maecenas venenatis iaculis sapien sit amet auctor. Curabitur euismod venenatis velit non tempor. Cras vel sapien purus, mollis fermentum nulla. Mauris sed elementum enim. Donec ultrices urna at justo adipiscing rutrum.</p>', '2012-08-09 01:19:59', 'admin',NULL, NULL, 0, 1);
 
 
--- --------------------------------------------------------
 
---
--- Table structure for table `challenges`
---
 
 CREATE TABLE IF NOT EXISTS `challenges` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -50,9 +40,6 @@ CREATE TABLE IF NOT EXISTS `challenges` (
   PRIMARY KEY (`id`)
 );
 
---
--- Dumping data for table `challenges`
---
 
 INSERT INTO `challenges` (`title`, `pkg_name`, `description`, `author`, `category`, `date_posted`, `visibility`, `publish`, `abstract`, `level`, `duration`, `goal`, `solution`, `availability`, `default_points`, `default_duration`) VALUES
 ('Challenge 1', 'ch001', 'Our agents (hackers) informed us that there reasonable suspicion \r\nthat the site of this <a href="ch001/" target="_blank">Logistics Company</a> is a blind \r\nfor a human organs''  smuggling organisation.<br /> <br /> This organisation attracts its \r\nvictims through advertisments for jobs with very high salaries. They choose those ones who \r\ndo not have many relatives, they assasinate them and then sell their organs to very rich \r\nclients, at very high prices.<br /> <br /> These employees are registered in the secret \r\nfiles of the company as "special clients"!<br /> <br /> One of our agents has been hired \r\nas by the particular company. Unfortunately, since 01/01/2007 he has gone missing.<br /> \r\n<br /> We know that our agent is alive, but we cannot contact him. Last time he  \r\ncommunicated with us, he mentioned that we could contact him at the  e-mail address the \r\ncompany has supplied him with, should there a problem  arise.<br /> <br /> The problem is \r\nthat when we last talked to him, he had not a company  e-mail address yet, but he told us \r\nthat his e-mail can be found through  the company''s site. <br /> <br /> The only thing we \r\nremember is that he was hired on Friday the 13th! <br /> <br /> You have to find his e-mail \r\naddress and send it to us by using the central communication panel of the company''s \r\nsite.<br /> <br /> Good luck!!!', 'Andreas Venieris,\n        Konstantinos Papapanagiotou,\n \n       Anastasios Stasinopoulos,\n        Vasilios Vlachos,\n        Alexandros \nPapanikolaou', 'web', '2012-08-09 00:23:14', 'public', 1, NULL, '1', 60, NULL, NULL, 'public', 1, 60),
@@ -68,11 +55,7 @@ INSERT INTO `challenges` (`title`, `pkg_name`, `description`, `author`, `categor
 ('Example Template For Challenge xml Files creation', 'example', '<p>Insert some text describing the scenario of the challenge(what the users are supposed to do and if there is any fictional story)</p>', 'Name or email or both', 'In what category does your challenge belong?(web? crypto? networks?)', '2012-10-16 22:35:01', 'private', 0, NULL, '1', 60, NULL, NULL, 'private', 1, 0),
 ('cookiEng', 'cookiEng', '<p>Hello, we have heard that you are one of the best hackers in our country. We need your services.<br>You must visit an underground site and find<br> the right password. With this password we will cancel 100k+ illegal gun and drug deals!\n The good news are that we have the  directory where the password is stored. Its here \\\"/t0psec.php\\\".\n The bad news are that we have no access there. Only the administrator does. Go and find the password for us!<br><br><br>Good luck!</p>', 'Nikos Danopoulos', 'web', '2012-08-09 00:32:07', 'public', 1, NULL, '1', 60, NULL, NULL, 'public', 1, 60),
 ('Izon Challenge', 'izon', '<p>After the mysterious disappearance of your best friend, you are contacted by an unknown individual who claims to have information about your friend. This individual identifies himself as \"Mister Jax\" and claims that is a former colleague of your friend.</p><p>Your friend was working at Izon Corporation, a weapons manufactured and government contractor as a systems engineer. Mister Jax didn\'t tell you his role in Izon, but wants you to pass through a series of tests to infiltrate Izon\'s web security to find the truth about your friend</p><p>After much consideration you agree with Mister Jax and he, remotely, sets up your computer to look like as if it is a part of Izon\'s Virtual Private Network in order to access their site. He also said that he\'ll guide you while you work your way to uncover the truth about your lost friend</p><p>Here is a copy of Mister Jax\'s last email:</p><p><pre>The task is simple: You get in, get your information and get out.\r\nYour friend was either a dumb programmer or a brilliant one, he left\r\nmany holes to be exploited in order to gain higher access to the site.\r\nI\'ll be guiding you with tips while you try to hack through Izon\'s site.\r\nThere are four tasks, some related to each other, some not.\r\nYou need to use your skills to overcome the obstacles, knowledge will come along.\r\nSixty minutes will suffice. When they\'re over, I won\'t be able to offer any\r\ncover to you, and you\'ll be compromised, with unknown consequences, I\'m afraid.\r\nI\'ll be seeing you there.\r\n\r\   - Jax</pre></p>	<p>Once you get in, you\'ll have sixty minutes to complete this challenge. Use common sense, remember that the most obvious place hides the most important stuff and try to behave as if you were hacking a real system.</p><p>Good Luck!</p>', 'Vasileios Mplanas', 'web', '2014-03-27 00:00:00', 'public', 1, NULL, '1', 60, NULL, NULL, 'public', 10, 60);
--- --------------------------------------------------------
 
---
--- Table structure for table `challenge_attempts`
---
 
 CREATE TABLE IF NOT EXISTS `challenge_attempts` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -83,11 +66,7 @@ CREATE TABLE IF NOT EXISTS `challenge_attempts` (
   PRIMARY KEY (`id`)
 );
 
--- --------------------------------------------------------
 
---
--- Table structure for table `challenge_attempt_count`
---
 
 CREATE TABLE IF NOT EXISTS `challenge_attempt_count` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -98,11 +77,7 @@ CREATE TABLE IF NOT EXISTS `challenge_attempt_count` (
   UNIQUE KEY `user_id` (`user_id`),
   UNIQUE KEY `challenge_id` (`challenge_id`)
 );
--- --------------------------------------------------------
 
---
--- Table structure for table `classes`
---
 
 CREATE TABLE IF NOT EXISTS `classes` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -112,19 +87,12 @@ CREATE TABLE IF NOT EXISTS `classes` (
   PRIMARY KEY (`id`)
 );
 
---
--- Dumping data for table `classes`
---
 
 INSERT INTO `classes` (`name`, `date_created`, `archive`) VALUES
 ('Sample Class', '2012-08-09 00:43:48', 0),
 ('fooClass', '2012-10-16 22:32:43', 0);
 
--- --------------------------------------------------------
 
---
--- Table structure for table `class_challenges`
---
 
 CREATE TABLE IF NOT EXISTS `class_challenges` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -134,9 +102,6 @@ CREATE TABLE IF NOT EXISTS `class_challenges` (
   PRIMARY KEY (`id`)
 );
 
---
--- Dumping data for table `class_challenges`
---
 
 INSERT INTO `class_challenges` (`challenge_id`, `class_id`, `date_created`) VALUES
 (1, 1, '2012-08-09 01:01:07'),
@@ -154,11 +119,7 @@ INSERT INTO `class_challenges` (`challenge_id`, `class_id`, `date_created`) VALU
 (10, 2, '2012-10-16 22:32:55'),
 (8, 2, '2012-10-16 22:32:58');
 
--- --------------------------------------------------------
 
---
--- Table structure for table `class_memberships`
---
 
 CREATE TABLE IF NOT EXISTS `class_memberships` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -169,9 +130,6 @@ CREATE TABLE IF NOT EXISTS `class_memberships` (
   UNIQUE KEY `id` (`id`)
 );
 
---
--- Dumping data for table `class_memberships`
---
 
 INSERT INTO `class_memberships` (`user_id`, `class_id`, `date_created`) VALUES
 ( 1, 1, '2012-08-09 00:59:00'),
@@ -180,11 +138,7 @@ INSERT INTO `class_memberships` (`user_id`, `class_id`, `date_created`) VALUES
 ( 4, 2, '2012-10-16 22:33:07'),
 ( 5, 2, '2012-10-16 22:33:13');
 
--- --------------------------------------------------------
 
---
--- Table structure for table `users`
---
 
 CREATE TABLE IF NOT EXISTS `users` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -201,18 +155,12 @@ CREATE TABLE IF NOT EXISTS `users` (
   UNIQUE KEY `id` (`id`)
 );
 
---
--- Dumping data for table `users`
---
 
 INSERT INTO `users` (`username`, `full_name`, `email`, `password`, `joined`, `last_visit`, `is_activated`, `type`, `token`) VALUES
 ('bar', 'mr. bar', 'bar@owasp.com', '$P$BJ8UtXZYqS/Lokm8zFMwcxO8dq797P.', '2012-10-16 22:12:52', '2012-10-16 22:22:39', 0, 0, 0),
 ('foo', 'mr. foo', 'foo@owasp.com', '$P$BxCHeVG1RMF06UxwRbrVQtPA1yOwAq.', '2012-10-16 22:12:34', '2012-10-16 22:59:29', 0, 0, 0),
 ('sensei', 'waspy sifu', 'waspy@owasp.sifu', '$P$Bj/JtLJJR3bUD0LLWXL2UW9DuRVo0I.', '2012-10-16 22:36:06', '2012-10-16 22:37:04', 1, 2, 0);
 
---
--- Table structure for table `user_has_challenge_token`
---
 DROP TABLE IF EXISTS `user_has_challenge_token`;
 CREATE TABLE IF NOT EXISTS `user_has_challenge_token` (
   `id` int(11) NOT NULL AUTO_INCREMENT,

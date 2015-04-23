@@ -7,7 +7,6 @@ CREATE OR REPLACE PROCEDURE who_called_me
 )
 AUTHID DEFINER
 AS
---depth based version of who_called_me from asktom
    call_stack  VARCHAR2(4096) default dbms_utility.format_call_stack;
    n           NUMBER;
    found_stack BOOLEAN DEFAULT FALSE;
@@ -17,19 +16,14 @@ BEGIN
    LOOP
        n := instr( call_stack, chr(10) );
        exit when ( n is NULL or n = 0 );
---
        line := substr( call_stack, 1, n-1 );
        call_stack := substr( call_stack, n+1 );
---
        if ( NOT found_stack ) then
            if ( line like '%handle%number%name%' ) then
                found_stack := TRUE;
            end if;
        else
            cnt := cnt + 1;
-           -- cnt = 1 is ME
-           -- cnt = 2 is MY Caller
-           -- cnt = 3 is Their Caller
            if ( cnt = (2+depth) ) then
                lineno := to_number(substr( line, 13, 8 ));
                line   := substr( line, 23 ); --set to rest of line .. change from 21 to 23

@@ -52,8 +52,8 @@ def lex(text):
         token = token_group.group(0)
         if token.isdigit():
             continue
-        # elif token.startswith(('"', "'")):
-        #     yield token[1:-1]
+        elif token.startswith(('"', "'")):
+            continue
         else:
             yield token
 
