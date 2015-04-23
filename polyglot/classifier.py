@@ -91,11 +91,11 @@ class Classifier(object):
             / (c_token(token) / c_tokens() )
         = c_token_on_lang(token, lang) / c_lang_tokens(lang)
         """
-        if not self.model.c_token_on_lang(token, lang) or not self.model.c_token(token):
-            # If this token is unseen, its prob should be less than what is seen only once
+        if not self.model.c_token_on_lang(token, lang):
+            # A crude smoothing algo
             logger.debug('%s is not seen in %s, use %f instead', token, lang,
-                    0.5/self.model.c_lang_tokens(lang))
-            return 0.5/self.model.c_lang_tokens(lang)
+                    1.0/(self.model.c_lang_tokens(lang)+1))
+            return 1.0/(self.model.c_lang_tokens(lang)+1)
         return self.model.c_token_on_lang(token, lang) / self.model.c_token(token)
 
 if __name__ == '__main__':
