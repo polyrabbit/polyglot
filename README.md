@@ -17,4 +17,5 @@ After training, we can use the Naive Bayes classifier to classify a given file. 
 ### References
  1. [A Plan For Spam](http://www.paulgraham.com/spam.html).
  2. [Naive Bayes spam filtering](http://en.wikipedia.org/wiki/Naive_Bayes_spam_filtering).
- 3. [The Good-Turing Estimate. CS 6740, Cornell University](http://www.cs.cornell.edu/courses/cs6740/2010sp/guides/lec11.pdf).
+ 3. [Implementation of naive bayesian spam filter algorithm](http://blog.csdn.net/hexinuaa/article/details/5596862).
+ 4. [How To Build a Naive Bayes Classifier](https://www.bionicspirit.com/blog/2012/02/09/howto-build-naive-bayes-classifier.html).

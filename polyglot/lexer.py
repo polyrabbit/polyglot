@@ -16,15 +16,15 @@ logger = logging.getLogger(__name__)
 # for single-quoted strings).
 # Shamelessly steal from https://github.com/django/django/blob/master/django/utils/text.py#L335
 lexer_patt = re.compile(r""" 
-    ((?: 
-        [^\s'"]* 
+    (?:  # ignore strings
+        \w* 
         (?: 
-            (?:"(?:[^"\\]|\\.)*" | '(?:[^'\\]|\\.)*') 
-            [^\s'"]* 
+            (?:"(?:[^"\\\n]|\\.)*" | '(?:[^'\\\n]|\\.)*') 
+            \w* 
         )+ 
-    ) | \w+ 
+    ) | (?P<tok>\w+ 
     | \S) 
-""", re.VERBOSE) 
+""", re.VERBOSE)
 
 def ngram(iterable, max_n, min_n=1):
     """
@@ -49,14 +49,16 @@ def lex(text):
     for token_group in lexer_patt.finditer(text):
     # for token in shlex(text):
     # for token in shlex(text.replace('"""', '"').replace("'''", "'")):  # For python
-        token = token_group.group(0)
+        token = token_group.group('tok')
+        if token is None:
+            continue
         if token.isdigit():
             continue
-        elif token.startswith(('"', "'")):
-            continue
+        # elif token.startswith(('"', "'")) or token.endswith(('"', "'")):
+        #     continue
         else:
             yield token
 
 if __name__ == '__main__':
-    assert list(lex('aa "ss" 23我')) == ['aa', '"ss"', u'我']
+    assert list(lex('aa "ss" 23我')) == ['aa', u'我']
     assert len(list(ngram(xrange(7), 3))) == 1+2+3*5

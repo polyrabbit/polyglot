@@ -1,6 +1,6 @@
 from __future__ import division
 import json
-from collections import defaultdict as dd
+from collections import defaultdict as dd, OrderedDict
 from operator import countOf
 from functools32 import lru_cache
 
@@ -27,34 +27,34 @@ class LanguageModel(object):
         #         "java": 3
         #     }
         # }
-        self.lang_stats = dd(lambda: dd(int))
+        # self.lang_stats = dd(lambda: dd(int))
+        self.lang_stats = dd(OrderedDict)
         self.fp = fp
     
     def put(self, language, tokens):
-        self.lang_stats[language][tokens] += 1
+        if tokens not in self.lang_stats[language]:
+            self.lang_stats[language][tokens] = 1
+        else:
+            self.lang_stats[language][tokens] += 1
 
     @lru_cache(maxsize=None)
-    def c_token_on_lang(self, token, lang):
+    def n_token_on_lang(self, token, lang):
         return self.lang_stats.get(lang, {}).get(token, 0)
 
     @lru_cache(maxsize=None)
-    def c_lang_tokens(self, lang):
+    def n_lang_tokens(self, lang):
         """Returns number of tokens given a specified language"""
         return sum(self.lang_stats.get(lang, {}).values())
 
     @lru_cache(maxsize=None)
-    def c_tokens(self):
+    def n_tokens(self):
         """Returns number of all tokens"""
         return sum(sum(stats.values()) for stats in self.lang_stats.values())
 
     @lru_cache(maxsize=None)
-    def c_token(self, token):
+    def n_token(self, token):
         """Returns number of a specified token"""
         return sum(stats.get(token, 0) for stats in self.lang_stats.values())
-
-    @lru_cache(maxsize=None)
-    def c_once(self):
-        return sum(countOf(stats.values(), 1) for stats in self.lang_stats.values())
 
     @lru_cache(maxsize=None)
     def languages(self):
@@ -64,14 +64,14 @@ class LanguageModel(object):
         logger.debug('Loading model file...')
         _lang_stats = json.load(self.fp)
         self.lang_stats = dd(dict)
-        # Convert a TOK_SEP separated string back to tuple againg
+        # Convert a TOK_SEP separated string back to tuple again
         for lang in _lang_stats:
             for token in _lang_stats[lang]:
                 self.lang_stats[lang][tuple(token.split(TOK_SEP))] = _lang_stats[lang][token]
         logger.debug('Finished loading')
 
     def save(self):
-        _lang_stats = dd(dict)
+        _lang_stats = dd(OrderedDict)
         # Json doesn't allow tuple to be a key, convert it to a TOK_SEP separated string
         for lang in self.lang_stats:
             for token in self.lang_stats[lang]:
@@ -88,5 +88,4 @@ class LanguageModel(object):
 if __name__ == '__main__':
     model = LanguageModel(open('model.json'))
     model.load()
-    print model.c_lang_tokens('Python')
-    print model.c_once()
+    print model.n_lang_tokens('Python')

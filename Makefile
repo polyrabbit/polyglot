@@ -4,7 +4,7 @@ RM_SHARP_COMMENT = sed -i '' '/^ *\#/d' {} \;
 RM_C_COMMENT = sed -i '' 's/\/\*.*\*\///; /\/\*/,/\*\//d; s/ \/\/.*//' {} \;
 RM_SQL_COMMENT = sed -i '' '/^ *--/d' {} \;
 
-.PHONY: clean_comments
+.PHONY: clean_comments test
 
 clean_comments:\
 	clean_config_comments\
@@ -29,3 +29,8 @@ clean_c_comments:
 clean_sql_comments:
 	find $(CORPUS) -iname '*.sql' -exec $(RM_SQL_COMMENT)
 
+test: model.json
+	polyglot classify --ngram 3 --model $<
+
+model.json:
+	polyglot train --corpus corpus --ngram 3 -v -o $@
