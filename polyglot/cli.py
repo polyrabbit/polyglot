@@ -40,7 +40,7 @@ def train(corpus, ngram, output, verbose):
 @click.option('-n', '--ngram', default=3, type=click.INT,
         help='The size of grams to use, the larger the better, but more expensive(default 3).')
 @click.option('-t', '--top', default=3, type=click.INT,
-        help='Output top N most likely language(default 3).')
+        help='Output top N most likely language, -1 means all(default 3).')
 @click.option('-v', '--verbose', is_flag=True, help='Run in debug mode.')
 @click.option('-m', '--model', type=click.File('r', lazy=True), default='model.json',
         help='Language model file which holds the training result(default model.json).')
