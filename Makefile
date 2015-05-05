@@ -29,8 +29,5 @@ clean_c_comments:
 clean_sql_comments:
 	find $(CORPUS) -iname '*.sql' -exec $(RM_SQL_COMMENT)
 
-test: model.json
-	polyglot classify --ngram 3 --model $<
-
-model.json:
-	polyglot train --corpus corpus --ngram 3 -v -o $@
+test:
+	python setup.py nosetests --nocapture --nologcapture

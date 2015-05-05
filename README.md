@@ -1,6 +1,8 @@
 polyglot
 ========
 
+[![Build Status](https://travis-ci.org/polyrabbit/polyglot.svg?branch=master)](https://travis-ci.org/polyrabbit/polyglot)
+
 Program language savant
 
 ### Getting Started

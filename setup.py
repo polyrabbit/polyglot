@@ -14,6 +14,7 @@ setup(
     include_package_data=True,
     platforms='any',
     install_requires=open('./requirements.txt').read().split('\n'),
+    setup_requires=['nose'],
     test_suite='nose.collector',
     tests_require=['nose'],
     entry_points={
