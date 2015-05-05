@@ -1,7 +1,6 @@
 from __future__ import division
 import json
-from collections import defaultdict as dd, OrderedDict
-from operator import countOf
+from collections import defaultdict, OrderedDict
 from functools32 import lru_cache
 
 import logging
@@ -27,8 +26,8 @@ class LanguageModel(object):
         #         "java": 3
         #     }
         # }
-        # self.lang_stats = dd(lambda: dd(int))
-        self.lang_stats = dd(OrderedDict)
+        # self.lang_stats = defaultdict(lambda: defaultdict(int))
+        self.lang_stats = defaultdict(OrderedDict)
         self.fp = fp
     
     def put(self, language, tokens):
@@ -63,7 +62,7 @@ class LanguageModel(object):
     def load(self):
         logger.debug('Loading model file...')
         _lang_stats = json.load(self.fp)
-        self.lang_stats = dd(dict)
+        self.lang_stats = defaultdict(dict)
         # Convert a TOK_SEP separated string back to tuple again
         for lang in _lang_stats:
             for token in _lang_stats[lang]:
@@ -71,7 +70,7 @@ class LanguageModel(object):
         logger.debug('Finished loading')
 
     def save(self):
-        _lang_stats = dd(OrderedDict)
+        _lang_stats = defaultdict(OrderedDict)
         # Json doesn't allow tuple to be a key, convert it to a TOK_SEP separated string
         for lang in self.lang_stats:
             for token in self.lang_stats[lang]:

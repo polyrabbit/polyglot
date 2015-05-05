@@ -45,65 +45,53 @@ class Classifier(object):
         """
         Guess language of the literal text.
         Returns a sorted array of possible languages. Each item contains
-        a language name and a confidence level from 0 to 1.
+        a language name and a score.
         """
         self.model.load()
-        confidence = {}
+        score = {}
         for lang in self.model.languages():
-            probability_list = []
+            probs = []
             for gram in ngram(lex(text), self.grams):
                 p = self.p_lang_on_token(lang, gram)
                 # We should not use 1.0 as a probability, as it will cause
                 # a lot of math errors
-                if p >= 1.0:
-                    p = .999
-                # Neither should an occasional token, as a big chunk of them will
-                # counterbalance the discriminating ones
-                # elif p < .0001:
-                #     continue
-                probability_list.append(p)
-            # probability_list.sort(reverse=True)
-            confidence[lang] = self.combined_probability(probability_list)
-            logger.debug('[%s] combined probability is %s', lang, confidence[lang])
-        return sorted(confidence.items(), key=lambda s: s[1], reverse=True)
+                # if p >= 1.0:
+                #     p = .999
+                probs.append(p)
+            # probs.sort(reverse=True)
+            score[lang] = self.combined_probability(probs, self.p_lang(lang))
+            logger.debug('[%s] probability is %s', lang, self.p_lang(lang))
+            logger.debug('[%s] combined probability is %s', lang, score[lang])
+        return sorted(score.items(), key=lambda s: s[1], reverse=True)
 
     # For a good explanation of the background, see:
-    # http://blog.csdn.net/hexinuaa/article/details/5596862
-    def combined_probability(self, probability_list):
-        def prod(iterable):
-            """
-            To avoid floating underflow, we multiply a scale
-            """
-            if not iterable:
-                return 0, 1
-            scale = 1
-            pi = 1.0
-            for x in iterable:
-                pi *= x
-                while pi <= 1e-10:
-                    pi *= 1e10
-                    scale *= 1e10
-            return pi, scale
+    # https://www.bionicspirit.com/blog/2012/02/09/howto-build-naive-bayes-classifier.html
+    def combined_probability(self, tok_probs, lang_prob):
+        """
+          P(lang | tok1, tok2, tok3...tokN)
+        
+          P(tok1, tok2, tok3...tokN | lang) * P(lang)
+        = --------------------------------------------
+                  P(tok1, tok2, tok3...tokN)
 
-        # return 1.0/(prod([1/p-1 for p in probability_list])+1)
-        # Damn floating underflow
-        prod_of_probability, s1 = prod(probability_list)
-        prod_of_complementing_probability, s2 = prod([1-p for p in probability_list])
-        # try:
-        return prod_of_probability / (prod_of_probability + prod_of_complementing_probability*(s1/s2))
-        # except ZeroDivisionError:
-        #     # We have a floating-point underflow
-        #     return 0
+        (naively assume that tokens are independent from each other)
 
-        # Opt 2: Usually p is not directly computed using the above formula
-        # due to floating-point underflow. Instead, p can be computed in the log domain
-        # p = 1 / (1 + e**eta) where eta equals sum(ln(1-p[i])-ln(p[i]) i=1,2,3...N
-        # see http://en.wikipedia.org/wiki/Naive_Bayes_spam_filtering
-        eta = sum(log(1-pi)-log(pi) for pi in probability_list)
-        # Since the probability is in inverse proportion to eta,
-        # we just return -eta to avoid OverflowError error
-        return -eta
-        # return 1.0 / (1 + exp(eta))
+         P(tok1|lang) * P(tok2|lang) * P(tok3|lang) ... P(tokN|lang) * P(lang)
+        = ---------------------------------------------------------------------
+             P(tok1) * P(tok2) * P(tok3) ... P(tokN)
+        
+                P(tok|lang)   P(lang|tok)
+              ( ----------- = ----------- )
+                  P(tok)        P(lang)
+
+         P(lang|tok1) * P(lang|tok2) * P(lang|tok3) ... P(lang|tokN) * P(lang)
+        = ---------------------------------------------------------------------
+                               P(lang)**N
+        """
+        # return reduce(lambda x, y: x*y, tok_probs) / (lang_prob**(len(tok_probs)-1))
+        # Usually p is not directly computed using the above formula due to 
+        # floating-point underflow. Instead, p can be computed in the log domain
+        return sum(map(log, tok_probs)) - (len(tok_probs)-1)*log(lang_prob)
 
     def p_lang_on_token(self, lang, token):
         """"
@@ -126,6 +114,9 @@ class Classifier(object):
         p = self.model.n_token_on_lang(token, lang) / self.model.n_token(token)
         logger.debug('[%s] probability given %s is %s', lang, token, p)
         return p
+
+    def p_lang(self, lang):
+        return self.model.n_lang_tokens(lang) / self.model.n_tokens()
 
 if __name__ == '__main__':
     from . import model
