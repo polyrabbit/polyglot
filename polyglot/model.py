@@ -10,7 +10,8 @@ logger = logging.getLogger(__name__)
 TOK_SEP = ' '
 
 class LanguageModel(object):
-    def __init__(self, fp):  # Filename should be better?
+
+    def __init__(self, fp):  # filename should be better?
         # Statistics of tokens in a language,
         # each key is a language name, and the value is a dict
         # consisting of tokens and their occurrence numbers
@@ -36,30 +37,35 @@ class LanguageModel(object):
         else:
             self.lang_stats[language][tokens] += 1
 
-    @lru_cache(maxsize=None)
+    # Never set cache size to infinite,
+    # which leads to memory leak
+    @lru_cache(maxsize=10240)
     def n_token_on_lang(self, token, lang):
         return self.lang_stats.get(lang, {}).get(token, 0)
 
-    @lru_cache(maxsize=None)
+    @lru_cache(maxsize=300)
     def n_lang_tokens(self, lang):
         """Returns number of tokens given a specified language"""
         return sum(self.lang_stats.get(lang, {}).values())
 
-    @lru_cache(maxsize=None)
+    @lru_cache(maxsize=1)
     def n_tokens(self):
         """Returns number of all tokens"""
         return sum(sum(stats.values()) for stats in self.lang_stats.values())
 
-    @lru_cache(maxsize=None)
+    @lru_cache(maxsize=10240)
     def n_token(self, token):
         """Returns number of a specified token"""
         return sum(stats.get(token, 0) for stats in self.lang_stats.values())
 
-    @lru_cache(maxsize=None)
+    @lru_cache(maxsize=1)
     def languages(self):
         return self.lang_stats.keys()
 
     def load(self):
+        # to ensure load only once
+        if self.lang_stats:
+            return
         logger.debug('Loading model file...')
         _lang_stats = json.load(self.fp)
         self.lang_stats = defaultdict(dict)

@@ -30,4 +30,4 @@ clean_sql_comments:
 	find $(CORPUS) -iname '*.sql' -exec $(RM_SQL_COMMENT)
 
 test:
-	python setup.py nosetests --nocapture
+	python -u setup.py nosetests --nocapture --nologcapture

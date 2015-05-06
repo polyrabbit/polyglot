@@ -45,7 +45,7 @@ def train(corpus, ngram, output, verbose):
 @click.option('-m', '--model', type=click.File('r', lazy=True), default='model.json',
         help='Language model file which holds the training result(default model.json).')
 def classify(file, model, ngram, top, verbose):
-    """Do a Naive Bayes classifier on the given FILE, output top N most likely languages"""
+    """Do a Naive Bayes classifier on the given FILE, top N most likely languages in descending order with their scores"""
     if verbose:
         logging.getLogger().setLevel(logging.DEBUG)
     db = LanguageModel(model)
