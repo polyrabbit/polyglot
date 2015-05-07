@@ -1,7 +1,3 @@
-/**
- * To compile & run on port 8080:
- * opa --parser js-like hello_syntax2.opa --
- */
 Server.start(
    Server.http,
    {
