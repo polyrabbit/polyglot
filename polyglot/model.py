@@ -39,7 +39,7 @@ class LanguageModel(object):
 
     # Never set cache size to infinite,
     # which leads to memory leak
-    @lru_cache(maxsize=10240)
+    @lru_cache(maxsize=102400)
     def n_token_on_lang(self, token, lang):
         return self.lang_stats.get(lang, {}).get(token, 0)
 
@@ -53,7 +53,7 @@ class LanguageModel(object):
         """Returns number of all tokens"""
         return sum(sum(stats.values()) for stats in self.lang_stats.values())
 
-    @lru_cache(maxsize=10240)
+    @lru_cache(maxsize=102400)
     def n_token(self, token):
         """Returns number of a specified token"""
         return sum(stats.get(token, 0) for stats in self.lang_stats.values())
