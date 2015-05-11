@@ -34,15 +34,15 @@ Run `polyglot classify --help` for usage specifics.
 
 1. Lex input string into tokens, and generate n-grams from those tokens (trigram by default)
 
-    ```
+
         "#include<stdio.h>".lex().ngram(max_n=3)
         
         =>[['#'], ['include'], ['<'], ['stdio'], ['.'], ['h'], ['>'], ['#', 'include'], ['include', '<'], ['<', 'stdio'], ['stdio', '.'], ['.', 'h'], ['h', '>'], ['#', 'include', '<'], ['include', '<', 'stdio'], ['<', 'stdio', '.'], ['stdio', '.', 'h'], ['.', 'h', '>']]
-    ```
+
 
 2. Computing the probability of a language given a token
 
-        ```
+
         P(lang | token) 
         
         = P(token | lang) * P(lang) / P(token)
@@ -54,39 +54,41 @@ Run `polyglot classify --help` for usage specifics.
            n_token_on_lang(token, lang) 
         = ------------------------------
            n_token(token)
-        ```
+
 
 3. Combining individual probabilities
 
-    ```
-   		P(lang | tok1, tok2, tok3...tokN)
+
+   		P(lang | tok_1, tok_2, tok_3...tok_n)
    		
-          P(tok1, tok2, tok3...tokN | lang) * P(lang)
+          P(tok_1, tok_2, tok_3...tok_n | lang) * P(lang)
         = --------------------------------------------
-                  P(tok1, tok2, tok3...tokN)
+                  P(tok_1, tok_2, tok_3...tok_n)
 
-        (naively assume that tokens are independent from each other)
+          (naively assume that tokens are independent from each other)
 
-          P(tok1|lang) * P(tok2|lang) * P(tok3|lang) ... P(tokN|lang) * P(lang)
+          P(tok_1|lang) * P(tok_2|lang) * P(tok_3|lang) ... P(tok_n|lang) * P(lang)
         = ---------------------------------------------------------------------
-             P(tok1) * P(tok2) * P(tok3) ... P(tokN)
+             P(tok_1) * P(tok_2) * P(tok_3) ... P(tok_n)
         
                 P(tok|lang)   P(lang|tok)
               ( ----------- = ----------- )
                   P(tok)        P(lang)
 
-          P(lang|tok1) * P(lang|tok2) * P(lang|tok3) ... P(lang|tokN) * P(lang)
+          P(lang|tok_1) * P(lang|tok_2) * P(lang|tok_3) ... P(lang|tok_n) * P(lang)
         = ---------------------------------------------------------------------
                                P(lang)^N
-    ```
+
 5. Dealing with rare words
 
-	```
-	P(unseen_token) = 1.0/(n_all_tokens()+1)
-	```
+
+		P(unseen_token) = 1.0/(n_all_tokens()+1)
+
 
 ### References
  1. [A Plan For Spam](http://www.paulgraham.com/spam.html)
  2. [Naive Bayes spam filtering](http://en.wikipedia.org/wiki/Naive_Bayes_spam_filtering)
  3. [Implementation of naive bayesian spam filter algorithm](http://blog.csdn.net/hexinuaa/article/details/5596862)
  4. [How To Build a Naive Bayes Classifier](https://www.bionicspirit.com/blog/2012/02/09/howto-build-naive-bayes-classifier.html)
+
+[V2EX讨论](https://www.v2ex.com/t/190152)
